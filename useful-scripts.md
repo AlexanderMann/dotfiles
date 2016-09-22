@@ -14,3 +14,11 @@
      5 Marc O'Morain
      4 Daniel Woelfel
      1 Brandon Bloom
+
+## Docker
+
+### Destroy Everything, Rebuild Everything
+
+    docker-compose rm -f
+    docker-compose pull
+    docker-compose up --build -d
