@@ -1,0 +1,4 @@
+brew "graphviz"
+brew "leiningen"
+cask "java"
+brew "node"
