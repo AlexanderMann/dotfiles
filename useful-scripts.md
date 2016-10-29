@@ -87,3 +87,38 @@ avg: 1.6588104632E-5
         (vals (ns-interns *ns*)))
 ```
 
+### Sort Requires in an ns
+```
+(let [current-file-name (-> (ns-name *ns*)
+                            str
+                            (clojure.string/split #"\.")
+                            second
+                            (clojure.string/replace "-" "_")
+                            (str ".clj"))
+      pwd (->> "pwd"
+               clojure.java.shell/sh
+               :out
+               clojure.string/trim)
+      files (file-seq (clojure.java.io/file pwd))
+      [file & err] (filter #(= current-file-name (.getName %))
+                           files)]
+  (when (seq err)
+    (throw (ex-info "Too many files found!" {:target current-file-name
+                                             :file file
+                                             :err err})))
+  (->> (slurp file)
+       read-string
+       (filter seqable?)
+       (filter #(= :require (first %)))
+       first
+       rest
+       sort
+       (cons :require)))
+```
+
+A lesser form of the above, but equally useful for when your current proj is all sorts of messed up (ie, file structure is too messed to use above):
+
+```
+(cons :require (sort (rest '(:require ...))))
+```
+
