@@ -22,11 +22,16 @@
 
 ### Destroy Everything, Rebuild Everything
 
+    docker-compose stop
     docker-compose rm -f
-    docker-compose pull
-    docker-compose up --build -d
+    docker-compose build --pull #--force-rm --no-cache
+    docker-compose up -d
 
 ## FS
+
+### MAC: Port being used
+
+    sudo lsof -i -n -P | grep TCP | grep $PORT_NUMBER
 
 ### Mount Using SSHFS
 
