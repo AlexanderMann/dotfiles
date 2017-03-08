@@ -3,3 +3,4 @@ brew "leiningen"
 cask "java"
 brew "node"
 brew "nginx"
+brew "go", args: ["--cross-compile-common"]

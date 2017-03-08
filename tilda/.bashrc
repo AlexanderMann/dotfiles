@@ -70,3 +70,19 @@ if [ "$TERM_PROGRAM" == "Apple_Terminal" ] && [ -z "$INSIDE_EMACS" ]; then
 fi
 
 source ~/.git-completion.bash
+
+### http://stackoverflow.com/documentation/bash/5515/managing-path-environment-variable#t=201703081914233124762
+rpath(){
+    for path in "$@";do
+        PATH="$(echo "$PATH" |sed -e "s#\(^\|:\)$(echo "$path" |sed -e 's/[^^]/[&]/g' -e 's/\^/\\^/g')\(:\|/\{0,1\}$\)#\1\2#" -e 's#:\+#:#g' -e 's#^:\|:$##g')"
+    done
+    echo "$PATH"
+}
+
+export PATH="$(rpath /usr/local/bin /usr/bin /bin /usr/sbin /sbin /usr/local/go/bin /usr/local/MacGPG2/bin)"
+
+### GO Setup
+export $GOPATH=~/git/gocode
+mkdir -p $GOPATH
+export PATH="$(rpath $GOPATH)"
+
