@@ -2,40 +2,58 @@
 
 ### Git blame number actions on a file by user
 
-    git blame -w src/circle/model/action_log.clj | perl -pe 's/^.*\((.*?)\s+\d\d\d\d-\d\d-\d\d.*/$1/' | sort | uniq -c | sort -nr
-    60 Conor McDermottroe
-    53 Ian Davis
-    51 Allen Rohner
-    47 Paul Biggar
-    21 Justin Cowperthwaite
-    18 Mahmood Ali
-    10 Gordon Syme
-     8 J. David Lowe
-     5 Marc O'Morain
-     4 Daniel Woelfel
-     1 Brandon Bloom
+```
+git blame -w src/circle/model/action_log.clj | perl -pe 's/^.*\((.*?)\s+\d\d\d\d-\d\d-\d\d.*/$1/' | sort | uniq -c | sort -nr
+60 Conor McDermottroe
+53 Ian Davis
+51 Allen Rohner
+47 Paul Biggar
+21 Justin Cowperthwaite
+18 Mahmood Ali
+10 Gordon Syme
+ 8 J. David Lowe
+ 5 Marc O'Morain
+ 4 Daniel Woelfel
+ 1 Brandon Bloom
+```
 
 ### Status of all repos
-    for d in *; do echo $d; git --git-dir=$d/.git --work-tree=$d branch -l; echo; done;
+```
+for d in *; do echo $d; git --git-dir=$d/.git --work-tree=$d branch -l; echo; done;
+```
+
+### Stale Branches
+```
+git fetch --prune
+```
+
+#### Merged Branches
+https://gist.github.com/schacon/942899
 
 ## Docker
 
 ### Destroy Everything, Rebuild Everything
+```
+docker-compose stop
+docker-compose rm -f
+docker-compose build --pull #--force-rm --no-cache
+docker-compose up -d
+```
 
-    docker-compose stop
-    docker-compose rm -f
-    docker-compose build --pull #--force-rm --no-cache
-    docker-compose up -d
+## Sublime
+`cmd + d` in sublime to select multiple matches
 
 ## FS
 
 ### MAC: Port being used
-
-    sudo lsof -i -n -P | grep TCP | grep $PORT_NUMBER
+```
+sudo lsof -i -n -P | grep TCP | grep $PORT_NUMBER
+```
 
 ### Mount Using SSHFS
-
-    umount -f ~/git/core-mount/ ; umount -f ~/.m2 ; rm -rf ~/git/core-mount/ ; rm -rf ~/.m2 ; mkdir ~/git/core-mount ; mkdir ~/.m2 ; sshfs core:/opt/code/ ~/git/core-mount ; sshfs core:/home/vagrant/.m2 ~/.m2
+```
+umount -f ~/git/core-mount/ ; umount -f ~/.m2 ; rm -rf ~/git/core-mount/ ; rm -rf ~/.m2 ; mkdir ~/git/core-mount ; mkdir ~/.m2 ; sshfs core:/opt/code/ ~/git/core-mount ; sshfs core:/home/vagrant/.m2 ~/.m2
+```
 
 ## CLJ
 
