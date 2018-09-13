@@ -145,3 +145,52 @@ A lesser form of the above, but equally useful for when your current proj is all
 (cons :require (sort (rest '(:require ...))))
 ```
 
+### Binding/With-Redefs Thread Confusion
+http://blog.cognitect.com/blog/2016/9/15/works-on-my-machine-understanding-var-bindings-and-roots
+
+```clj
+
+(def ^:dynamic *answer* 42)
+(defn answer [] *answer*)
+
+(comment
+  (println (answer))
+  (binding [*answer* 0]
+    (future
+      (Thread/sleep 1000)
+      (println "1" (answer))))
+  (with-redefs [*answer* 0]
+    (future
+      (Thread/sleep 1000)
+      (println "2" (answer))))
+  (with-redefs [answer (constantly 0)]
+    (future
+      (Thread/sleep 1000)
+      (println "3" (answer)))))
+
+```
+
+Outputs:
+```clj
+(println (answer))
+42
+=> nil
+(binding [*answer* 0]
+    (future
+      (Thread/sleep 1000)
+      (println "1" (answer))))
+=> #future[{:status :pending, :val nil} 0x3fa806cb]
+1 0
+(with-redefs [*answer* 0]
+    (future
+      (Thread/sleep 1000)
+      (println "2" (answer))))
+=> #future[{:status :pending, :val nil} 0x67b9bf4e]
+2 42
+(with-redefs [answer (constantly 0)]
+    (future
+      (Thread/sleep 1000)
+      (println "3" (answer))))
+=> #future[{:status :pending, :val nil} 0x523d51b2]
+3 42
+```
