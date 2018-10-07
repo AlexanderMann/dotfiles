@@ -1,6 +1,10 @@
+tap "homebrew/bundle"
+tap "homebrew/cask"
+tap "homebrew/core"
+brew "go", args: ["--cross-compile-common"]
 brew "graphviz"
 brew "leiningen"
-cask "java"
-brew "node"
 brew "nginx"
-brew "go", args: ["--cross-compile-common"]
+brew "node"
+cask "java"
+cask "ngrok"
