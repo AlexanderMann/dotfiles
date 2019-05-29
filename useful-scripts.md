@@ -28,7 +28,18 @@ git fetch --prune
 ```
 
 #### Merged Branches
+
+##### Remote
+
 https://gist.github.com/schacon/942899
+
+##### Local
+
+https://stackoverflow.com/a/6127884
+
+```
+git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
+```
 
 ### Forks
 
