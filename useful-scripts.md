@@ -1,8 +1,12 @@
+# Useful Scripts
+
+Little things I tend to lookup _all_ the time...and don't ever change...
+
 ## Git
 
 ### Git blame number actions on a file by user
 
-```
+```sh
 git blame -w src/circle/model/action_log.clj | perl -pe 's/^.*\((.*?)\s+\d\d\d\d-\d\d-\d\d.*/$1/' | sort | uniq -c | sort -nr
 60 Conor McDermottroe
 53 Ian Davis
@@ -18,12 +22,14 @@ git blame -w src/circle/model/action_log.clj | perl -pe 's/^.*\((.*?)\s+\d\d\d\d
 ```
 
 ### Status of all repos
-```
+
+```sh
 for d in *; do echo $d; git --git-dir=$d/.git --work-tree=$d branch -l; echo; done;
 ```
 
 ### Stale Branches
-```
+
+```sh
 git fetch --prune
 ```
 
@@ -37,7 +43,7 @@ https://gist.github.com/schacon/942899
 
 https://stackoverflow.com/a/6127884
 
-```
+```sh
 git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
 ```
 
@@ -49,13 +55,13 @@ https://gist.github.com/CristinaSolana/1885435
 
 1. Clone your fork:
 
-```
+```sh
 git clone git@github.com:YOUR-USERNAME/YOUR-FORKED-REPO.git
 ```
 
 2. Add remote from original repository in your forked repository:
 
-```
+```sh
 cd into/cloned/fork-repo
 git remote add upstream git://github.com/ORIGINAL-DEV-USERNAME/REPO-YOU-FORKED-FROM.git
 git fetch upstream
@@ -63,13 +69,37 @@ git fetch upstream
 
 3. Updating your fork from original repo to keep up with their changes:
 
-```
+```sh
 git pull upstream master
+```
+
+### Pull in files from another branch
+
+```sh
+git checkout <branch_name> -- <paths>
+```
+
+### Find checked in code, replace across the entire repo: `git grep ... sed ...`
+
+Finds the files which have whatever pattern you're looking for, then pipes them into
+`sed` which is able to replace all occurences of _any pattern_ in that files etc.
+
+```sh
+git grep -lz <whatever-youre-hoping-to-replace> \
+| xargs -0 sed -i '' -e 's|<full-sed-pattern>|<full-sed-command>|g'
 ```
 
 ## Docker
 
-### Destroy Everything, Rebuild Everything
+```
+docker system df
+docker system prune -a
+docker volume prune -a
+docker image prune -a
+```
+
+### Compose Destroy Everything, Rebuild Everything
+
 ```
 docker-compose stop
 docker-compose rm -f
@@ -78,23 +108,43 @@ docker-compose up -d
 ```
 
 ## Sublime
+
 `cmd + d` in sublime to select multiple matches
+
+## Regex
+
+### Not: Negative Lookahead
+
+```
+(?!(<regex-pattern-here>).*)
+```
 
 ## FS
 
 ### MAC: Port being used
-```
+
+```sh
 sudo lsof -i -n -P | grep TCP | grep $PORT_NUMBER
 ```
 
 ### Mount Using SSHFS
-```
+
+```sh
 umount -f ~/git/core-mount/ ; umount -f ~/.m2 ; rm -rf ~/git/core-mount/ ; rm -rf ~/.m2 ; mkdir ~/git/core-mount ; mkdir ~/.m2 ; sshfs core:/opt/code/ ~/git/core-mount ; sshfs core:/home/vagrant/.m2 ~/.m2
+```
+
+### `find`
+
+#### By Name
+
+```sh
+find /the/path/to/the/dir -name <a-standard-regex>
 ```
 
 ## CLJ
 
 ### Atom Reseting Timing Results
+
 ```
 (defmacro time-ret
   [expr]
@@ -137,17 +187,20 @@ avg: 1.6588104632E-5
 ```
 
 ### Completely messed up ns in the repl
+
 ```
 (remove-ns (ns-name *ns*))
 ```
 
 ### Tests Core.Test will run
+
 ```
 (filter #(:test (meta %))
         (vals (ns-interns *ns*)))
 ```
 
 ### Sort Requires in an ns
+
 ```
 (let [current-file-name (-> (ns-name *ns*)
                             str
@@ -183,6 +236,7 @@ A lesser form of the above, but equally useful for when your current proj is all
 ```
 
 ### Binding/With-Redefs Thread Confusion
+
 http://blog.cognitect.com/blog/2016/9/15/works-on-my-machine-understanding-var-bindings-and-roots
 
 ```clj
@@ -208,6 +262,7 @@ http://blog.cognitect.com/blog/2016/9/15/works-on-my-machine-understanding-var-b
 ```
 
 Outputs:
+
 ```clj
 (println (answer))
 42
@@ -231,3 +286,55 @@ Outputs:
 => #future[{:status :pending, :val nil} 0x523d51b2]
 3 42
 ```
+
+## Python
+
+### Reload Module in REPL
+
+For Python2.x
+
+```py
+reload(module)
+```
+
+For above 2.x and <=Python3.3
+
+```py
+from imp import reload
+
+reload(module)
+```
+
+For >=Python3.4
+
+```py
+from importlib import reload
+
+reload(module)
+```
+
+## PostgreSQL
+
+### Long Running Queries
+
+```sql
+SELECT
+  pid,
+  now() - pg_stat_activity.query_start AS duration,
+  query,
+  state
+FROM pg_stat_activity
+WHERE (now() - pg_stat_activity.query_start) > interval '5 minutes';
+```
+
+### Kill Queries
+
+```sql
+SELECT pg_cancel_backend(__pid__);
+```
+
+```sql
+SELECT pg_terminate_backend(__pid__);
+```
+
+> kill -9 in PostgreSQL. It will terminate the entire process which can lead to a full database restart in order to recover consistency.
