@@ -1,6 +1,7 @@
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/core"
+brew "direnv"
 brew "go", args: ["--cross-compile-common"]
 brew "graphviz"
 brew "leiningen"
