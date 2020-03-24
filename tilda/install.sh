@@ -9,7 +9,7 @@ rm ~/.bash_profile;
 cp .bash_profile ~;
 
 # Homebrew
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 brew update;
 brew tap Homebrew/bundle;
 brew bundle;
