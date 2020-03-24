@@ -86,3 +86,5 @@ export $GOPATH=~/git/gocode
 mkdir -p $GOPATH
 export PATH="$(rpath $GOPATH)"
 
+### direnv setup
+eval "$(direnv hook bash)"
