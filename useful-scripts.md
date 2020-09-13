@@ -45,6 +45,8 @@ https://stackoverflow.com/a/6127884
 
 ```sh
 git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
+git branch -vv | grep backup/amann | cut -d ' ' -f3 | xargs git branch -D
+git branch -vv | grep 'gone]' | cut -d ' ' -f3 | xargs git branch -D
 ```
 
 ### Forks
