@@ -329,6 +329,25 @@ FROM pg_stat_activity
 WHERE (now() - pg_stat_activity.query_start) > interval '5 minutes';
 ```
 
+### Long Running Taransactions
+
+```sql
+SELECT
+  s.xact_start,
+  s.query_start,
+  s.query,
+  s.state,
+  s.usename,
+  s.pid,
+  l.mode
+FROM pg_stat_activity AS s
+  JOIN pg_locks AS l ON l.pid = s.pid
+  JOIN pg_class AS c ON c.oid = l.relation
+WHERE c.relkind = 'r'
+  AND c.relname = '<TABLE_NAME>'
+ORDER BY 1 DESC;
+```
+
 ### Kill Queries
 
 ```sql
@@ -340,3 +359,4 @@ SELECT pg_terminate_backend(__pid__);
 ```
 
 > kill -9 in PostgreSQL. It will terminate the entire process which can lead to a full database restart in order to recover consistency.
+
