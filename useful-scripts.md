@@ -39,13 +39,24 @@ git fetch --prune
 
 https://gist.github.com/schacon/942899
 
+```
+git branch -r --merged | 
+  grep origin | 
+  grep -v '>' |
+  grep -v master |
+  grep -v main |
+  xargs -L1 | 
+  awk '{split($0,a,"/"); print a[2]}' | 
+  xargs git push origin --delete
+```
+
 ##### Local
 
 https://stackoverflow.com/a/6127884
 
 ```sh
 git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
-git branch -vv | grep backup/amann | cut -d ' ' -f3 | xargs git branch -D
+git branch -vv | grep 'backup/' | cut -d ' ' -f3 | xargs git branch -D
 git branch -vv | grep 'gone]' | cut -d ' ' -f3 | xargs git branch -D
 ```
 
