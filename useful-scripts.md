@@ -23,9 +23,9 @@ git blame -w src/circle/model/action_log.clj | perl -pe 's/^.*\((.*?)\s+\d\d\d\d
 
 ### Status of all repos
 
-```sh
-for d in *; do echo $d; git --git-dir=$d/.git --work-tree=$d branch -l; echo; done;
-```
+See `tidy.sh`
+
+git --git-dir=$f --work-tree=$d branch -l;
 
 ### Stale Branches
 
@@ -55,7 +55,7 @@ git branch -r --merged |
 https://stackoverflow.com/a/6127884
 
 ```sh
-git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
+git branch --merged | egrep -v "(^\*|main|master|dev)" | xargs git branch -d
 git branch -vv | grep 'backup/' | cut -d ' ' -f3 | xargs git branch -D
 git branch -vv | grep 'gone]' | cut -d ' ' -f3 | xargs git branch -D
 ```
@@ -95,7 +95,7 @@ git checkout <branch_name> -- <paths>
 ### Find checked in code, replace across the entire repo: `git grep ... sed ...`
 
 Finds the files which have whatever pattern you're looking for, then pipes them into
-`sed` which is able to replace all occurences of _any pattern_ in that files etc.
+`sed` which is able to replace all occurrences of _any pattern_ in that files etc.
 
 ```sh
 git grep -lz <whatever-youre-hoping-to-replace> \
@@ -351,3 +351,103 @@ SELECT pg_terminate_backend(__pid__);
 ```
 
 > kill -9 in PostgreSQL. It will terminate the entire process which can lead to a full database restart in order to recover consistency.
+
+### Table counts
+
+```sql
+SELECT
+  schemaname AS schema,
+  relname AS table,
+  n_live_tup AS count
+FROM pg_stat_user_tables 
+WHERE schemaname != 'tmp'
+ORDER BY n_live_tup DESC;
+```
+
+### Table Bytes
+
+```sql
+WITH raw_bytes AS (
+
+SELECT c.oid,
+  nspname AS schema,
+  relname AS name,
+  c.reltuples AS row_estimate,
+  pg_total_relation_size(c.oid) AS total_bytes,
+  pg_indexes_size(c.oid) AS index_bytes,
+  COALESCE(
+    pg_total_relation_size(reltoastrelid),
+    0) AS toast_bytes
+FROM pg_class AS c
+  LEFT JOIN pg_namespace AS n
+    ON n.oid = c.relnamespace
+WHERE relkind = 'r'
+
+), calculated_bytes AS (
+
+SELECT
+  *,
+  total_bytes - index_bytes - toast_bytes AS data_bytes
+FROM raw_bytes
+
+), final AS (
+
+SELECT
+  schema || ':' || name AS id,
+  *,
+  pg_size_pretty(total_bytes) AS total,
+  pg_size_pretty(index_bytes) AS index,
+  pg_size_pretty(toast_bytes) AS toast,
+  pg_size_pretty(data_bytes) AS data,
+  CEIL(LOG(total_bytes)) AS scale
+FROM calculated_bytes
+ORDER BY total_bytes DESC
+
+)
+
+SELECT
+  id,
+  name,
+  schema,
+  scale,
+  total_bytes,
+  total,
+  'total' AS type
+FROM final
+
+UNION
+
+SELECT
+  id,
+  name,
+  schema,
+  scale,
+  index_bytes,
+  index,
+  'index' AS type
+FROM final
+
+UNION
+
+SELECT
+  id,
+  name,
+  schema,
+  scale,
+  toast_bytes AS bytes,
+  toast AS pretty,
+  'toast' AS type
+FROM final
+
+UNION
+
+SELECT
+  id,
+  name,
+  schema,
+  scale,
+  data_bytes AS bytes,
+  data AS pretty,
+  'data' AS type
+FROM final
+```
