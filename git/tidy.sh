@@ -1,4 +1,4 @@
-PRETTY_WATERMARK_TIME=$(date -v-3m)
+PRETTY_WATERMARK_TIME=$(date -v-1m)
 WATERMARK_TIME=$(date -j -f "%a %b %d %T %Z %Y" "${PRETTY_WATERMARK_TIME}" "+%s")
 echo ${WATERMARK_TIME} :: ${PRETTY_WATERMARK_TIME}
 
