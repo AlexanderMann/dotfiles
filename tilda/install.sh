@@ -1,5 +1,9 @@
 set -x
 
+# Finder
+defaults write com.apple.Finder AppleShowAllFiles true
+killall Finder
+
 # Oh my ZSH
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 rm ~/.zshrc;
